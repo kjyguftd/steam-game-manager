@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "id": "fa789003-08c7-44ff-9307-4616535447cf",
+    "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
+    "appId": "668630",
+    "status": "Playing",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "1143f2c5-18ea-4f4d-b509-829d37a0340b",
+    "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
+    "appId": "10",
+    "status": "Planning",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "6cc73acb-2a8f-4bf8-9c6e-333924bc2b33",
+    "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
+    "appId": "20",
+    "status": "Completed",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "2f4af292-bbcd-450e-aa17-3c5b1c5de2cb",
+    "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
+    "appId": "30",
+    "status": "Playing",
+    "userRating": null,
+    "targetFinishDate": null
+  }
+]
