@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Enhanced Steam Game Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<header>
+    <h1>🎮 AI-Enhanced Steam Game Manager</h1>
+</header>
+
+<main id="app-container">
+    <section id="auth-section">
+        <h2>用户认证</h2>
+        <form id="login-form">
+            <label for="login-username"></label><input type="text" id="login-username" placeholder="用户名" required>
+            <label for="login-password"></label><input type="password" id="login-password" placeholder="密码" required>
+            <button type="submit">Log In</button>
+        </form>
+        <button id="show-register">New User? Register</button>
+
+        <form id="register-form" style="display: none;">
+            <h3>注册新账号</h3>
+            <label for="reg-username"></label><input type="text" id="reg-username" placeholder="用户名" required>
+            <label for="reg-steamid"></label><input type="text" id="reg-steamid" placeholder="SteamID64" required>
+            <label for="reg-password"></label><input type="password" id="reg-password" placeholder="密码" required>
+            <button type="submit">Register</button>
+            <button type="button" id="hide-register">Cancel</button>
+        </form>
+        <p id="auth-message"></p>
+    </section>
+
+    <section id="main-app" style="display: none;">
+        <nav>
+            <button id="sync-library">同步游戏库</button>
+            <button id="logout-button">Log Out</button>
+        </nav>
+        <div id="dashboard">
+            <div id="ai-insights">
+                <h3>🤖 玩家档案与洞察</h3>
+                <p id="player-profile">点击同步库后获取AI洞察...</p>
+                <p id="life-balance"></p>
+            </div>
+
+            <div id="chart-area">
+                <h3>📈 游戏时间分布</h3>
+                <canvas id="playtime-chart"></canvas>
+            </div>
+        </div>
+
+        <h2>📚 我的游戏待办 (Backlog)</h2>
+        <ul id="game-list">
+        </ul>
+    </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
