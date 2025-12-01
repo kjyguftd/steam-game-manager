@@ -57,17 +57,17 @@ The architecture is prepared for the following stretch goals, which require inte
    cd steam-game-manager
 ```
 
-## 2. Configure Steam API Key
+2. **Configure Steam API Key**
 - Open `server/utils/steamApi.js`
 - **CRITICAL:** Replace the placeholder value for `STEAM_API_KEY` with your actual key.
 
-## 3. Seed Data
+3. **Seed Data**
 - Ensure `server/data/users.json` and `server/data/backlog.json` exist and contain at least an empty array `[]`.
 
-## 4. Run the Server
+4. **Run the Server**
 ```bash
   node server/server.js
 ```
 
-## 5. Access the Application
+5. **Access the Application**
 - The application will be available at [http://localhost:3000/](http://localhost:3000/).

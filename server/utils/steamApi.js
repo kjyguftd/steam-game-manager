@@ -2,8 +2,7 @@ const https = require('https'); // 使用内置的 https 模块
 const url = require('url');
 
 // ⚠️ 最佳实践：将此 Key 存储为环境变量！
-// 提案中提供的 Key: 5220F08CD26B1283651F52770FFF0044
-const STEAM_API_KEY = 'YOUR_STEAM_WEB_API_KEY';
+const STEAM_API_KEY = '5220F08CD26B1283651F52770FFF0044';
 
 const STEAM_API_BASE = 'api.steampowered.com';
 const OWNED_GAMES_PATH = '/IPlayerService/GetOwnedGames/v0001/';
