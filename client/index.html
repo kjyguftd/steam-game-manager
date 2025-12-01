@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,29 +12,29 @@
 <header>
     <div class="container header-content">
         <h1 class="logo">🎮 Steam Manager AI</h1>
-        <button id="logout-button" class="btn btn-secondary" style="display:none;">登出</button>
-        <button id="theme-toggle" class="btn btn-secondary">🌓 模式切换</button>
+        <button id="logout-button" class="btn btn-secondary" style="display:none;">Logout</button>
+        <button id="theme-toggle" class="btn btn-secondary">🌓 Theme</button>
     </div>
 </header>
 
 <main id="app-container" class="container">
     <section id="auth-section" class="auth-card card">
-        <h2>用户认证</h2>
+        <h2>User Authentication</h2>
         <div class="form-wrapper">
             <form id="login-form">
-                <input type="text" id="login-username" placeholder="用户名" required>
-                <input type="password" id="login-password" placeholder="密码" required>
-                <button type="submit" class="btn btn-primary full-width">登录</button>
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" class="btn btn-primary full-width">Login</button>
             </form>
-            <button id="show-register" class="link-btn">没有账号？注册</button>
+            <button id="show-register" class="link-btn">Don't have an account? Register</button>
 
             <form id="register-form" style="display: none;">
-                <h3>注册新账号</h3>
-                <input type="text" id="reg-username" placeholder="用户名" required>
+                <h3>Register New Account</h3>
+                <input type="text" id="reg-username" placeholder="Username" required>
                 <input type="text" id="reg-steamid" placeholder="SteamID64" required>
-                <input type="password" id="reg-password" placeholder="密码" required>
-                <button type="submit" class="btn btn-primary full-width">注册</button>
-                <button type="button" id="hide-register" class="link-btn mt-1">取消</button>
+                <input type="password" id="reg-password" placeholder="Password" required>
+                <button type="submit" class="btn btn-primary full-width">Register</button>
+                <button type="button" id="hide-register" class="link-btn mt-1">Cancel</button>
             </form>
         </div>
         <p id="auth-message" class="message"></p>
@@ -44,23 +44,34 @@
 
         <div class="sidebar">
             <div class="card nav-card">
-                <button id="sync-library" class="btn btn-primary full-width">🔄 同步游戏库</button>
+                <button id="sync-library" class="btn btn-primary full-width">🔄 Sync Library</button>
             </div>
 
             <div id="ai-insights" class="card ai-card">
-                <h4>🤖 玩家档案与洞察</h4>
-                <p id="player-profile" class="insight-text">点击同步库后获取AI洞察...</p>
+                <h4>🤖 Player Profile & Insights</h4>
+                <p id="player-profile" class="insight-text">Click Sync Library to get AI insights...</p>
                 <p id="life-balance" class="ai-recommendation"></p>
             </div>
         </div>
 
         <div class="content">
             <div id="chart-area" class="card chart-card">
-                <h4>📈 游戏时间分布</h4>
+                <h4>📈 Top Games by Playtime</h4>
                 <canvas id="playtime-chart"></canvas>
             </div>
 
-            <h2>📚 我的游戏待办 (Backlog)</h2>
+            <div class="backlog-header">
+                <h2>📚 My Game Backlog</h2>
+                <div class="filter-container">
+                    <label for="game-filter">Filter:</label>
+                    <select id="game-filter" class="filter-selector">
+                        <option value="all">All Games</option>
+                        <option value="never-played">Never Played (0 hours)</option>
+                        <option value="over-50h">Over 50 Hours</option>
+                        <option value="over-100h">Over 100 Hours</option>
+                    </select>
+                </div>
+            </div>
             <ul id="game-list" class="game-list-grid">
             </ul>
         </div>

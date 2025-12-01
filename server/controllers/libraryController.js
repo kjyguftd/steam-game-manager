@@ -55,7 +55,7 @@ const syncLibrary = async (req, res) => {
 
                 // 合并本地数据
                 isBacklogged: !!backlogEntry,
-                status: backlogEntry ? backlogEntry.status : 'Not Started', // 默认或本地状态
+                status: backlogEntry ? backlogEntry.status : null, // No default status
                 userRating: backlogEntry ? backlogEntry.userRating : null,
                 targetFinishDate: backlogEntry ? backlogEntry.targetFinishDate : null,
                 // 本地 Backlog 的唯一 ID (用于后续 CRUD 操作)

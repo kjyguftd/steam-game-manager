@@ -30,5 +30,21 @@
     "status": "Playing",
     "userRating": null,
     "targetFinishDate": null
+  },
+  {
+    "id": "6b479d67-e2f1-4a7f-a3d4-0fad7a1c785e",
+    "userId": "aafadb3e-54f3-44f6-a0a2-756d1e98dd6c",
+    "appId": "50",
+    "status": "Planning",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "e27521ad-ce0f-48b0-a403-9067fec0edda",
+    "userId": "aafadb3e-54f3-44f6-a0a2-756d1e98dd6c",
+    "appId": "440",
+    "status": "Completed",
+    "userRating": null,
+    "targetFinishDate": null
   }
 ]
