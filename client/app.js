@@ -174,6 +174,24 @@ logoutButton.addEventListener('click', async () => {
     }
 });
 
+themeToggleBtn.addEventListener('click', () => {
+    const root = document.documentElement;
+    if (root.classList.contains('dark-mode')) {
+        root.classList.remove('dark-mode');
+        root.classList.add('light-mode');
+        localStorage.setItem('theme', 'light');
+    } else {
+        root.classList.remove('light-mode');
+        root.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+    }
+
+    // 切换后重新渲染图表颜色
+    if (mainApp.style.display === 'grid') {
+        renderPlaytimeChart();
+    }
+});
+
 // ------------------- 界面切换 -------------------
 
 showRegisterBtn.addEventListener('click', () => {
