@@ -5,5 +5,12 @@
     "hashedPassword": "6bfcd7bf3d2ed25b62f3e8ed1ab529803b4b286fb82947131a0b3bd44759d95ba24bada62605ca9b41b0ec1fd481b8d770d6f5c8d51bafcf329c929da05f5416",
     "salt": "f0e840d4c5907ba528e99eea1d09b512",
     "steamId64": "76561198147962777"
+  },
+  {
+    "id": "aafadb3e-54f3-44f6-a0a2-756d1e98dd6c",
+    "username": "Kaiwen",
+    "hashedPassword": "6db5cdc83a002745ce8ccbfb56fed1ad0c609f4e818b80801f0e1e8990dce20b5f970fa4b491302d2c57db9906e42d9dfff586e322a0fb6c683f474261963679",
+    "salt": "9575c6d0b375d6130e6aabd9a4791904",
+    "steamId64": "76561198147962777"
   }
 ]

@@ -259,6 +259,65 @@ header {
 }
 
 /* --- 游戏列表 --- */
+.backlog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.backlog-header h2 {
+    margin: 0;
+    color: var(--color-primary);
+}
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-container label {
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.filter-selector {
+    padding: 8px 12px;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-input-bg);
+    color: var(--color-text-main);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.95em;
+    min-width: 200px;
+}
+
+.filter-selector:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .backlog-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-container {
+        width: 100%;
+    }
+
+    .filter-selector {
+        flex: 1;
+        min-width: auto;
+    }
+}
+
 .game-list-grid {
     list-style: none;
     display: grid;
@@ -281,6 +340,20 @@ header {
 .game-item-card:hover {
     transform: scale(1.03);
     box-shadow: 0 10px 20px var(--color-shadow);
+}
+
+.game-image-container {
+    width: 100%;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .game-image-placeholder {
@@ -325,7 +398,7 @@ header {
 .status-Playing { background-color: var(--color-secondary); }
 .status-Completed { background-color: var(--color-success); }
 .status-Planning { background-color: var(--color-primary); }
-.status-NotStarted { background-color: var(--color-text-muted); }
+.status-unmarked { background-color: transparent; }
 
 .game-status {
     padding: 3px 8px;
@@ -340,7 +413,6 @@ header {
 .status-Playing { background-color: var(--color-secondary); color: white; }
 .status-Completed { background-color: var(--color-success); color: white; }
 .status-Planning { background-color: var(--color-primary); color: white; }
-.status-NotStarted { background-color: var(--color-text-muted); color: var(--color-background); }
 
 .status-selector {
     padding: 8px;

@@ -16,8 +16,10 @@ const playtimeChartCanvas = document.getElementById('playtime-chart');
 const playerProfileEl = document.getElementById('player-profile');
 const lifeBalanceEl = document.getElementById('life-balance');
 const themeToggleBtn = document.getElementById('theme-toggle');
+const gameFilterSelect = document.getElementById('game-filter');
 
 let playtimeChartInstance = null;
+let allGames = []; // Store all games for filtering
 const API_BASE_URL = '/api';
 
 // --- 辅助函数 ---
@@ -45,13 +47,13 @@ const displayAuthMessage = (message, isError = false) => {
  */
 const validateForm = (data) => {
     if (!data.username || !data.password) {
-        return '用户名和密码不能为空。';
+        return 'Username and password cannot be empty.';
     }
     if (data.password.length < 6) {
-        return '密码长度至少为 6 位。';
+        return 'Password must be at least 6 characters.';
     }
     if (data.isRegister && !data.steamId64) {
-        return 'SteamID64 不能为空。';
+        return 'SteamID64 cannot be empty.';
     }
     return null;
 };
@@ -99,17 +101,17 @@ registerForm.addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (response.ok) {
-            displayAuthMessage('注册成功！请登录。', false);
-            // 切换回登录界面
+            displayAuthMessage('Registration successful! Please login.', false);
+            // Switch back to login form
             registerForm.style.display = 'none';
             showRegisterBtn.style.display = 'block';
             loginForm.style.display = 'block';
             registerForm.reset();
         } else {
-            displayAuthMessage(`注册失败: ${result.message}`, true);
+            displayAuthMessage(`Registration failed: ${result.message}`, true);
         }
     } catch (error) {
-        displayAuthMessage('网络错误，请稍后再试。', true);
+        displayAuthMessage('Network error, please try again later.', true);
     }
 });
 
@@ -137,18 +139,18 @@ loginForm.addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (response.ok) {
-            displayAuthMessage('登录成功！', false);
+            displayAuthMessage('Login successful!', false);
             setUIVisible(true);
             loginForm.reset();
 
-            // 登录成功后加载仪表板
+            // Load dashboard after successful login
             loadDashboard();
 
         } else {
-            displayAuthMessage(`登录失败: ${result.message}`, true);
+            displayAuthMessage(`Login failed: ${result.message}`, true);
         }
     } catch (error) {
-        displayAuthMessage('网络错误，请稍后再试。', true);
+        displayAuthMessage('Network error, please try again later.', true);
     }
 });
 
@@ -156,12 +158,12 @@ logoutButton.addEventListener('click', async () => {
     try {
         await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
 
-        displayAuthMessage('已安全登出。', false);
+        displayAuthMessage('Logged out successfully.', false);
         setUIVisible(false);
-        // 清理 UI 数据
+        // Clear UI data
         gameListUl.innerHTML = '';
-        // 忽略 Ollama 相关的清理
-        playerProfileEl.innerHTML = '点击同步库后获取AI洞察...';
+        // Ignore Ollama-related cleanup
+        playerProfileEl.innerHTML = 'Click Sync Library to get AI insights...';
         lifeBalanceEl.innerHTML = '';
         if (playtimeChartInstance) {
             playtimeChartInstance.destroy();
@@ -169,7 +171,7 @@ logoutButton.addEventListener('click', async () => {
         }
 
     } catch (error) {
-        displayAuthMessage('网络错误，无法完成登出。', true);
+        displayAuthMessage('Network error, unable to logout.', true);
         setUIVisible(false);
     }
 });
@@ -186,7 +188,7 @@ themeToggleBtn.addEventListener('click', () => {
         localStorage.setItem('theme', 'dark');
     }
 
-    // 切换后重新渲染图表颜色
+    // Re-render chart colors after switching
     if (mainApp.style.display === 'grid') {
         renderPlaytimeChart();
     }
@@ -221,29 +223,50 @@ const renderGameCard = (game) => {
     li.setAttribute('data-appid', game.appId);
     li.setAttribute('data-backlogid', game.backlogId || '');
 
-    // 移除状态中的空格以便用于 CSS 类名
-    const cleanStatus = game.status.replace(/\s/g, '');
-    const statusClass = `status-${cleanStatus}`;
+    // Remove spaces from status for CSS class names
+    const cleanStatus = game.status ? game.status.replace(/\s/g, '') : '';
+    const statusClass = game.status ? `status-${cleanStatus}` : 'status-unmarked';
     const playtimeHours = Math.round(game.playtimeMinutes / 60);
-    const ratingDisplay = game.userRating ? `⭐️ ${game.userRating}/10` : '未评分';
+    const ratingDisplay = game.userRating ? `⭐️ ${game.userRating}/10` : 'Not Rated';
+    const statusDisplay = game.status || '';
 
-    // 创建状态选择器的选项
-    const statuses = ['Not Started', 'Planning', 'Playing', 'Completed'];
-    const optionsHtml = statuses.map(status => `
+    // Steam game cover image URLs with multiple fallbacks
+    const imageUrls = [
+        `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
+        `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${game.appId}/capsule_616x353.jpg`,
+        `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/library_600x900.jpg`,
+        `https://steamcdn-a.akamaihd.net/steam/apps/${game.appId}/header.jpg`
+    ];
+
+    // Create status selector options
+    const statuses = ['Planning', 'Playing', 'Completed'];
+    const statusOptionsHtml = statuses.map(status => `
         <option value="${status.replace(/\s/g, '')}" ${cleanStatus === status.replace(/\s/g, '') ? 'selected' : ''}>${status}</option>
     `).join('');
 
+    // Add placeholder option if game has no status
+    const hasStatus = game.status && game.status !== 'Not Started' && game.status !== null;
+    const optionsHtml = hasStatus
+        ? statusOptionsHtml
+        : `<option value="" selected disabled>-- Set Status --</option>${statusOptionsHtml}`;
+
     li.innerHTML = `
         <div class="${statusClass} status-bar"></div>
-        <div class="game-image-placeholder">
-             <!-- 使用游戏名的首字母作为占位符 -->
-             ${game.name.substring(0, 1)}
+        <div class="game-image-container">
+             <img src="${imageUrls[0]}"
+                  data-fallback-urls='${JSON.stringify(imageUrls.slice(1))}'
+                  alt="${game.name}"
+                  class="game-cover-image">
+             <div class="game-image-placeholder" style="display:none;">
+                 ${game.name.substring(0, 1)}
+             </div>
         </div>
         <div class="game-info">
             <h5 class="game-title">${game.name}</h5>
-            <span class="game-status ${statusClass}">${game.status}</span>
+            ${statusDisplay ? `<span class="game-status ${statusClass}">${statusDisplay}</span>` : ''}
             <div class="game-details">
-                <span class="playtime">总时长: ${playtimeHours} 小时</span> 
+                <span class="playtime">Total Playtime: ${playtimeHours} hours</span>
                 <span>${ratingDisplay}</span>
             </div>
             <div class="actions mt-1">
@@ -254,13 +277,32 @@ const renderGameCard = (game) => {
         </div>
     `;
 
-    // 绑定状态选择器的事件监听器
+    // Bind event listener for status selector
     li.querySelector('.status-selector').addEventListener('change', (e) => {
         const newStatus = e.target.value;
         const appId = e.target.getAttribute('data-appid');
         const backlogId = e.target.getAttribute('data-backlogid');
 
         updateGameStatus(appId, backlogId, newStatus);
+    });
+
+    // Handle image loading with fallback URLs
+    const imgElement = li.querySelector('.game-cover-image');
+    const placeholderElement = li.querySelector('.game-image-placeholder');
+    let currentFallbackIndex = 0;
+
+    imgElement.addEventListener('error', function() {
+        const fallbackUrls = JSON.parse(this.getAttribute('data-fallback-urls') || '[]');
+
+        if (currentFallbackIndex < fallbackUrls.length) {
+            // Try next fallback URL
+            this.src = fallbackUrls[currentFallbackIndex];
+            currentFallbackIndex++;
+        } else {
+            // All URLs failed, show placeholder
+            this.style.display = 'none';
+            placeholderElement.style.display = 'flex';
+        }
     });
 
     return li;
@@ -271,9 +313,9 @@ const renderGameCard = (game) => {
  */
 const syncLibraryData = async () => {
     syncLibraryBtn.disabled = true;
-    syncLibraryBtn.textContent = '🔄 正在同步...';
+    syncLibraryBtn.textContent = '🔄 Syncing...';
     gameListUl.innerHTML = '';
-    playerProfileEl.innerHTML = '点击同步库后获取AI洞察...'; // 保持占位符
+    playerProfileEl.innerHTML = 'Click Sync Library to get AI insights...'; // Keep placeholder
 
     try {
         const response = await fetch(`${API_BASE_URL}/library/sync`);
@@ -283,23 +325,56 @@ const syncLibraryData = async () => {
         }
 
         const games = await response.json();
+        allGames = games; // Store games for filtering
 
         if (games.length === 0) {
-            gameListUl.innerHTML = '<p class="message" style="color:var(--color-text-muted);">未找到任何游戏或您的Steam账户是私有的。</p>';
+            gameListUl.innerHTML = '<p class="message" style="color:var(--color-text-muted);">No games found or your Steam account is private.</p>';
         } else {
-            games.forEach(game => {
-                gameListUl.appendChild(renderGameCard(game));
-            });
+            renderFilteredGames(); // Use filter function instead of direct rendering
         }
 
-        // 成功同步后，更新图表 (图表数据端点使用相同的基础数据)
+        // Update chart after successful sync (chart data endpoint uses same base data)
         renderPlaytimeChart();
 
     } catch (error) {
-        gameListUl.innerHTML = `<p class="message" style="color:var(--color-error);">同步错误: ${error.message}</p>`;
+        gameListUl.innerHTML = `<p class="message" style="color:var(--color-error);">Sync error: ${error.message}</p>`;
     } finally {
         syncLibraryBtn.disabled = false;
-        syncLibraryBtn.textContent = '🔄 同步游戏库';
+        syncLibraryBtn.textContent = '🔄 Sync Library';
+    }
+};
+
+/**
+ * Filter and render games based on selected filter
+ */
+const renderFilteredGames = () => {
+    const filterValue = gameFilterSelect.value;
+    gameListUl.innerHTML = '';
+
+    let filteredGames = allGames;
+
+    switch (filterValue) {
+        case 'never-played':
+            filteredGames = allGames.filter(game => game.playtimeMinutes === 0);
+            break;
+        case 'over-50h':
+            filteredGames = allGames.filter(game => game.playtimeMinutes > 3000); // 50 hours * 60 minutes
+            break;
+        case 'over-100h':
+            filteredGames = allGames.filter(game => game.playtimeMinutes > 6000); // 100 hours * 60 minutes
+            break;
+        case 'all':
+        default:
+            filteredGames = allGames;
+            break;
+    }
+
+    if (filteredGames.length === 0) {
+        gameListUl.innerHTML = '<p class="message" style="color:var(--color-text-muted);">No games found matching this filter.</p>';
+    } else {
+        filteredGames.forEach(game => {
+            gameListUl.appendChild(renderGameCard(game));
+        });
     }
 };
 
@@ -310,12 +385,12 @@ const syncLibraryData = async () => {
  * @param {string} newStatus
  */
 const updateGameStatus = async (appId, backlogId, newStatus) => {
-    // 1. 确定是创建 (POST) 还是更新 (PUT)
+    // 1. Determine whether to create (POST) or update (PUT)
     const method = backlogId ? 'PUT' : 'POST';
     const url = backlogId ? `${API_BASE_URL}/backlog/${backlogId}` : `${API_BASE_URL}/backlog`;
     const payload = backlogId
-        ? { status: newStatus } // 更新只需要状态
-        : { appId: appId, status: newStatus }; // 创建需要 appId 和状态
+        ? { status: newStatus } // Update only needs status
+        : { appId: appId, status: newStatus }; // Create needs appId and status
 
     try {
         const response = await fetch(url, {
@@ -328,11 +403,11 @@ const updateGameStatus = async (appId, backlogId, newStatus) => {
             throw new Error(`Failed to update status.`);
         }
 
-        // 成功后，强制重新同步数据以更新 UI 和图表
+        // After success, force re-sync data to update UI and chart
         syncLibraryData();
 
     } catch (error) {
-        alert(`状态更新失败: ${error.message}`);
+        alert(`Status update failed: ${error.message}`);
         console.error('Backlog update error:', error);
     }
 };
@@ -358,22 +433,42 @@ const renderPlaytimeChart = async () => {
         const textColor = getChartTextColor(); // 获取当前模式的文本颜色
 
         playtimeChartInstance = new Chart(playtimeChartCanvas, {
-            type: 'pie', // 饼图
+            type: 'pie',
             data: data,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'top',
+                        position: 'right',
                         labels: {
-                            color: textColor // 应用文本颜色
+                            color: textColor,
+                            boxWidth: 15,
+                            padding: 10,
+                            font: {
+                                size: 11
+                            }
                         }
                     },
                     title: {
                         display: true,
-                        text: '总游戏时间分布 (按本地状态)',
-                        color: textColor // 应用文本颜色
+                        text: 'Top 15 Games by Playtime',
+                        color: textColor,
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} hrs (${percentage}%)`;
+                            }
+                        }
                     }
                 }
             }
@@ -381,7 +476,7 @@ const renderPlaytimeChart = async () => {
 
     } catch (error) {
         console.error('Chart rendering failed:', error);
-        playtimeChartCanvas.innerHTML = '<p style="color:var(--color-error);">无法加载图表数据。</p>';
+        playtimeChartCanvas.innerHTML = '<p style="color:var(--color-error);">Unable to load chart data.</p>';
     }
 };
 
@@ -389,10 +484,10 @@ const renderPlaytimeChart = async () => {
 // ------------------- 初始化 -------------------
 
 const loadDashboard = async () => {
-    // 1. 加载图表和游戏列表 (syncLibraryData 会调用 renderPlaytimeChart)
+    // 1. Load chart and game list (syncLibraryData will call renderPlaytimeChart)
     syncLibraryData();
 
-    // 2. 忽略 Ollama 相关的调用
+    // 2. Ignore Ollama-related calls
 };
 
 /**
@@ -418,6 +513,9 @@ const checkLoginStatus = async () => {
 document.addEventListener('DOMContentLoaded', checkLoginStatus);
 
 syncLibraryBtn.addEventListener('click', syncLibraryData);
+
+// Add filter change event listener
+gameFilterSelect.addEventListener('change', renderFilteredGames);
 
 // 监听系统主题变化，并重新渲染图表以更新文本颜色
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
