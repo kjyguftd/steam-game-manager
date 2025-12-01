@@ -1,0 +1,348 @@
+/* --- 基础重置与变量 --- */
+:root {
+    /* 默认/深色模式颜色变量 */
+    --color-primary: #1e90ff;
+    --color-secondary: #ff4500;
+    --color-background: #1e1e1e;
+    --color-card-bg: #2d2d2d;
+    --color-text-main: #f0f0f0;    /* 主文本颜色 */
+    --color-text-muted: #aaaaaa;
+    --color-input-bg: #333;         /* 输入框背景 */
+    --color-input-border: #444;     /* 输入框边框 */
+    --color-success: #4caf50;
+    --color-error: #f44336;
+    --font-main: 'Montserrat', sans-serif;
+    --font-code: 'Source Code Pro', monospace;
+    --border-radius: 8px;
+    --color-shadow: rgba(0, 0, 0, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- 浅色模式定义 --- */
+/* 遵循用户的系统偏好设置 */
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-background: #f7f7f7;   /* 亮色背景 */
+        --color-card-bg: #ffffff;      /* 亮色卡片背景 */
+        --color-text-main: #333333;    /* 深色文本 */
+        --color-text-muted: #666666;
+        --color-input-bg: #f0f0f0;
+        --color-input-border: #cccccc;
+        --color-shadow: rgba(0, 0, 0, 0.1); /* 浅色阴影 */
+    }
+}
+
+/* --- 基础样式更新 --- */
+body {
+    font-family: var(--font-main);
+    background-color: var(--color-background);
+    color: var(--color-text-main);
+    line-height: 1.6;
+    padding-top: 60px;
+    /* 深色背景纹理 */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6"><rect fill="%23252525" width="6" height="6"/><rect fill="%232d2d2d" x="0" y="0" width="3" height="3"/><rect fill="%232d2d2d" x="3" y="3" width="3" height="3"/></svg>');
+    background-repeat: repeat;
+}
+@media (prefers-color-scheme: light) {
+    body {
+        /* 浅色背景纹理 */
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6"><rect fill="%23f7f7f7" width="6" height="6"/><rect fill="%23e0e0e0" x="0" y="0" width="3" height="3"/><rect fill="%23e0e0e0" x="3" y="3" width="3" height="3"/></svg>');
+    }
+}
+
+/* --- 滚动条美化 (仅 Webkit 浏览器) --- */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-input-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-text-muted);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+}
+
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Header --- */
+header {
+    background-color: var(--color-card-bg);
+    box-shadow: 0 2px 4px var(--color-shadow);
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+/* --- 通用卡片样式 --- */
+.card {
+    background-color: var(--color-card-bg);
+    box-shadow: 0 4px 8px var(--color-shadow);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+/* --- 按钮样式 --- */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    /* 在深色模式下使用亮色卡片背景作为文字颜色 */
+    color: var(--color-card-bg);
+}
+
+.btn-primary:hover {
+    background-color: #007bff;
+}
+
+.btn-primary:disabled {
+    background-color: var(--color-input-border);
+    cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: light) {
+    .btn-primary {
+        /* 在浅色模式下，按钮文字应使用深色背景色 */
+        color: var(--color-background);
+    }
+}
+
+.btn-secondary {
+    background-color: var(--color-text-muted);
+    color: var(--color-background);
+}
+
+.btn-secondary:hover {
+    background-color: #888888;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.mt-1 { margin-top: 10px; }
+
+/* --- 认证界面 --- */
+.auth-card {
+    max-width: 400px;
+    margin: 80px auto 20px;
+    text-align: center;
+}
+
+.auth-card h2 {
+    margin-bottom: 20px;
+    color: var(--color-primary);
+}
+
+/* 统一输入框/选择器样式 */
+.form-wrapper input,
+.form-wrapper select {
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-text-main);
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+}
+
+.form-wrapper button[type="submit"] {
+    margin-top: 10px;
+}
+
+.message {
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+/* --- 主应用布局 (Main App) --- */
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    padding: 20px 0;
+}
+
+@media (min-width: 768px) {
+    .main-layout {
+        grid-template-columns: 250px 1fr;
+    }
+}
+
+/* --- 侧边栏 --- */
+.sidebar {
+    padding-top: 5px;
+}
+
+.ai-card h4 {
+    color: var(--color-secondary);
+    margin-bottom: 10px;
+}
+
+.insight-text {
+    font-style: italic;
+    color: var(--color-text-main);
+    margin-bottom: 10px;
+}
+
+.ai-recommendation {
+    border-top: 1px solid var(--color-input-border);
+    padding-top: 10px;
+    color: var(--color-success);
+    font-weight: 600;
+}
+.ai-label {
+    font-size: 0.75em;
+    color: var(--color-secondary);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* --- 图表区 --- */
+.chart-card {
+    max-height: 400px;
+    padding: 15px;
+}
+.chart-card canvas {
+    max-height: 350px;
+}
+
+/* --- 游戏列表 --- */
+.game-list-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding-top: 10px;
+}
+
+/* --- 游戏列表卡片重设计 --- */
+.game-item-card {
+    background-color: var(--color-card-bg); /* 使用卡片背景变量 */
+    border: none;
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+    border-radius: var(--border-radius);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-item-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 20px var(--color-shadow);
+}
+
+.game-image-placeholder {
+    width: 100%;
+    height: 150px;
+    background-color: var(--color-input-bg);
+    background-image: linear-gradient(135deg, var(--color-input-bg) 0%, var(--color-input-border) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    overflow: hidden;
+}
+
+.game-info {
+    padding: 15px;
+}
+
+.game-title {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: var(--color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-details {
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.status-bar {
+    height: 5px;
+    width: 100%;
+}
+.status-Playing { background-color: var(--color-secondary); }
+.status-Completed { background-color: var(--color-success); }
+.status-Planning { background-color: var(--color-primary); }
+.status-NotStarted { background-color: var(--color-text-muted); }
+
+.game-status {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+/* 状态颜色 */
+.status-Playing { background-color: var(--color-secondary); color: white; }
+.status-Completed { background-color: var(--color-success); color: white; }
+.status-Planning { background-color: var(--color-primary); color: white; }
+.status-NotStarted { background-color: var(--color-text-muted); color: var(--color-background); }
+
+.status-selector {
+    padding: 8px;
+    border: 1px solid var(--color-input-border); /* 使用变量 */
+    border-radius: var(--border-radius);
+    background-color: var(--color-input-bg); /* 使用变量 */
+    color: var(--color-text-main); /* 使用变量 */
+    cursor: pointer;
+}
