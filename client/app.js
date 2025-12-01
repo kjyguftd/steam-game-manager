@@ -15,6 +15,7 @@ const playtimeChartCanvas = document.getElementById('playtime-chart');
 // 忽略 Ollama 相关的元素，但保留 AI 区域的占位符
 const playerProfileEl = document.getElementById('player-profile');
 const lifeBalanceEl = document.getElementById('life-balance');
+const themeToggleBtn = document.getElementById('theme-toggle');
 
 let playtimeChartInstance = null;
 const API_BASE_URL = '/api';
@@ -67,6 +68,10 @@ const getChartTextColor = () => {
     return isDarkMode ? '#f0f0f0' : '#333333';
 };
 
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    document.documentElement.classList.add(savedTheme + '-mode');
+}
 
 // ------------------- 认证逻辑 -------------------
 

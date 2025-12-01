@@ -23,18 +23,15 @@
     padding: 0;
 }
 
-/* --- 浅色模式定义 --- */
-/* 遵循用户的系统偏好设置 */
-@media (prefers-color-scheme: light) {
-    :root {
-        --color-background: #f7f7f7;   /* 亮色背景 */
-        --color-card-bg: #ffffff;      /* 亮色卡片背景 */
-        --color-text-main: #333333;    /* 深色文本 */
-        --color-text-muted: #666666;
-        --color-input-bg: #f0f0f0;
-        --color-input-border: #cccccc;
-        --color-shadow: rgba(0, 0, 0, 0.1); /* 浅色阴影 */
-    }
+/* --- 浅色模式定义：通过 .light-mode 类覆盖默认变量 --- */
+.light-mode {
+    --color-background: #f7f7f7;   /* 亮色背景 */
+    --color-card-bg: #ffffff;      /* 亮色卡片背景 */
+    --color-text-main: #333333;    /* 深色文本 */
+    --color-text-muted: #666666;
+    --color-input-bg: #f0f0f0;
+    --color-input-border: #cccccc;
+    --color-shadow: rgba(0, 0, 0, 0.1); /* 浅色阴影 */
 }
 
 /* --- 基础样式更新 --- */
@@ -48,11 +45,10 @@ body {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6"><rect fill="%23252525" width="6" height="6"/><rect fill="%232d2d2d" x="0" y="0" width="3" height="3"/><rect fill="%232d2d2d" x="3" y="3" width="3" height="3"/></svg>');
     background-repeat: repeat;
 }
-@media (prefers-color-scheme: light) {
-    body {
-        /* 浅色背景纹理 */
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6"><rect fill="%23f7f7f7" width="6" height="6"/><rect fill="%23e0e0e0" x="0" y="0" width="3" height="3"/><rect fill="%23e0e0e0" x="3" y="3" width="3" height="3"/></svg>');
-    }
+
+/* 浅色模式下的背景纹理 */
+.light-mode body {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6"><rect fill="%23f7f7f7" width="6" height="6"/><rect fill="%23e0e0e0" x="0" y="0" width="3" height="3"/><rect fill="%23e0e0e0" x="3" y="3" width="3" height="3"/></svg>');
 }
 
 /* --- 滚动条美化 (仅 Webkit 浏览器) --- */
@@ -91,14 +87,25 @@ header {
 
 .header-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 12px;
 }
 
-.logo {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--color-primary);
+.header-content .logo {
+    margin-right: auto;
+}
+
+/* 响应式：窄屏下允许换行并保持可读性 */
+@media (max-width: 600px) {
+    .header-content {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .header-content .logo {
+        margin-right: 0;
+        width: 100%;
+        text-align: left;
+    }
 }
 
 /* --- 通用卡片样式 --- */
@@ -123,8 +130,7 @@ header {
 
 .btn-primary {
     background-color: var(--color-primary);
-    /* 在深色模式下使用亮色卡片背景作为文字颜色 */
-    color: var(--color-card-bg);
+    color: var(--color-card-bg); /* 在深色模式下使用亮色卡片背景作为文字颜色 */
 }
 
 .btn-primary:hover {
@@ -136,11 +142,9 @@ header {
     cursor: not-allowed;
 }
 
-@media (prefers-color-scheme: light) {
-    .btn-primary {
-        /* 在浅色模式下，按钮文字应使用深色背景色 */
-        color: var(--color-background);
-    }
+/* 浅色模式下的按钮文字颜色 */
+.light-mode .btn-primary {
+    color: var(--color-background);
 }
 
 .btn-secondary {
