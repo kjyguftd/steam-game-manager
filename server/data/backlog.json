@@ -11,7 +11,7 @@
     "id": "1143f2c5-18ea-4f4d-b509-829d37a0340b",
     "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
     "appId": "10",
-    "status": "Planning",
+    "status": "Playing",
     "userRating": null,
     "targetFinishDate": null
   },
@@ -27,7 +27,7 @@
     "id": "2f4af292-bbcd-450e-aa17-3c5b1c5de2cb",
     "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
     "appId": "30",
-    "status": "Playing",
+    "status": "Planning",
     "userRating": null,
     "targetFinishDate": null
   },
@@ -44,6 +44,38 @@
     "userId": "aafadb3e-54f3-44f6-a0a2-756d1e98dd6c",
     "appId": "440",
     "status": "Completed",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "688f1923-4344-4557-89b2-12ad3cf57854",
+    "userId": "640d479d-69cb-41f4-92f9-ec763df34aef",
+    "appId": "222880",
+    "status": "Planning",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "a6ab04ff-5988-4849-b3c8-96480a7ccce9",
+    "userId": "f53adccb-aca9-4d7b-841b-c0d7afe7a3bc",
+    "appId": "3079280",
+    "status": "Playing",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "02570271-7d59-416b-9b0f-47126a0b3c93",
+    "userId": "f53adccb-aca9-4d7b-841b-c0d7afe7a3bc",
+    "appId": "632470",
+    "status": "Playing",
+    "userRating": null,
+    "targetFinishDate": null
+  },
+  {
+    "id": "9742cb80-c665-4e4b-8be5-6deb38a0b274",
+    "userId": "f53adccb-aca9-4d7b-841b-c0d7afe7a3bc",
+    "appId": "3528450",
+    "status": "Playing",
     "userRating": null,
     "targetFinishDate": null
   }

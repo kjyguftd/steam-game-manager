@@ -1,8 +1,10 @@
 const url = require('url');
-const authController = require('./controllers/authController');
-const libraryController = require('./controllers/libraryController');
-const backlogController = require('./controllers/backlogController'); // 导入 Backlog 控制器
-const chartController = require('./controllers/chartController'); // 导入新的控制器
+const authController = require('./controllers/authController.js');
+const libraryController = require('./controllers/libraryController.js');
+const backlogController = require('./controllers/backlogController.js');
+const chartController = require('./controllers/chartController.js');
+const userController = require('./controllers/userController.js');
+
 // 路由映射表使用路径模式 (注意：使用 :id 作为占位符)
 // { 'METHOD /path/pattern': handlerFunction }
 const routes = {
@@ -11,7 +13,8 @@ const routes = {
     'POST /api/auth/login': authController.login,
     'POST /api/auth/logout': authController.logout,
 
-    // 游戏库同步路由 (需要认证)
+    // 库同步（支持 POST/GET 两种方式，均需认证）
+    'POST /api/library/sync': (req, res) => authController.authenticate(req, res, libraryController.syncLibrary),
     'GET /api/library/sync': (req, res) => authController.authenticate(req, res, libraryController.syncLibrary),
 
     // Backlog CRUD 路由 (需要认证)
@@ -22,60 +25,132 @@ const routes = {
 
     // 图表数据路由 (需要认证)
     'GET /api/charts/playtime': (req, res) => authController.authenticate(req, res, chartController.getPlaytimeSummary),
+
+    // 保存用户 Steam API Key（必须认证或可按需移除认证）
+    'POST /api/user/:id/apikey': (req, res) => authController.authenticate(req, res, userController.saveApiKey),
 };
 
-// **新的路由匹配函数，支持动态路径**
+/**
+ * 匹配路径并提取动态参数
+ * 返回 { handler, params } 或 null
+ */
 const matchRoute = (method, path) => {
     const routeKeys = Object.keys(routes);
     for (const key of routeKeys) {
         const [routeMethod, routePathPattern] = key.split(' ');
+        if (routeMethod !== method) continue;
 
-        if (routeMethod === method) {
-            // 将路径模式转换为正则表达式 (替换 :id 为捕获组)
-            const regexPath = routePathPattern.replace(/:[a-zA-Z]+/g, '([^/]+)');
-            const regex = new RegExp(`^${regexPath}$`);
-
-            if (regex.test(path)) {
-                // 如果匹配，返回对应的处理函数
-                return routes[key];
+        // 提取参数名数组 e.g. [ 'id' ]
+        const paramNames = [];
+        const patternWithCapture = routePathPattern.replace(/:([a-zA-Z0-9_]+)/g, (_, name) => {
+            paramNames.push(name);
+            return '([^/]+)';
+        });
+        const regex = new RegExp(`^${patternWithCapture}$`);
+        const m = regex.exec(path);
+        if (m) {
+            const params = {};
+            // m[0] 是完整匹配，组从 m[1] 开始
+            for (let i = 0; i < paramNames.length; i++) {
+                params[paramNames[i]] = decodeURIComponent(m[i + 1]);
             }
+            return { handler: routes[key], params };
         }
     }
-    return null; // 未找到匹配项
+    return null;
 };
 
+// // **新的路由匹配函数，支持动态路径**
+// const matchRoute = (method, path) => {
+//     const routeKeys = Object.keys(routes);
+//     for (const key of routeKeys) {
+//         const [routeMethod, routePathPattern] = key.split(' ');
+//
+//         if (routeMethod === method) {
+//             // 将路径模式转换为正则表达式 (替换 :id 为捕获组)
+//             const regexPath = routePathPattern.replace(/:[a-zA-Z]+/g, '([^/]+)');
+//             const regex = new RegExp(`^${regexPath}$`);
+//
+//             if (regex.test(path)) {
+//                 // 如果匹配，返回对应的处理函数
+//                 return routes[key];
+//             }
+//         }
+//     }
+//     return null; // 未找到匹配项
+// };
+
 const handleRequest = (req, res) => {
-    // ... (CORS 和 OPTIONS 处理不变) ...
+    // 基本 CORS 头
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        return res.end();
+    }
 
     const parsedUrl = url.parse(req.url, true);
     const method = req.method;
     const path = parsedUrl.pathname;
 
-    // 使用新的匹配函数查找处理程序
-    const handler = matchRoute(method, path);
+    const match = matchRoute(method, path);
 
-    if (handler) {
-        if (method === 'POST' || method === 'PUT') {
-            // ... (请求体处理不变) ...
-            let body = '';
-            req.on('data', chunk => {
-                body += chunk.toString();
-            });
-            req.on('end', () => {
+    if (!match) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'API Endpoint Not Found' }));
+        return;
+    }
+
+    // 将查询参数与动态 params 赋到 req 上，供 handler 使用
+    req.query = parsedUrl.query || {};
+    req.params = match.params || {};
+
+    const handler = match.handler;
+
+    // 仅对 POST/PUT 解析 JSON body
+    if (method === 'POST' || method === 'PUT') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+            // 简单保护，防止过大请求
+            if (body.length > 1e7) {
+                // 10MB 限制
+                res.writeHead(413, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Payload too large' }));
+                req.destroy();
+            }
+        });
+        req.on('end', () => {
+            if (body) {
                 try {
                     req.body = JSON.parse(body);
-                    handler(req, res);
                 } catch (e) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ message: 'Invalid JSON payload' }));
+                    return;
                 }
-            });
-        } else {
-            handler(req, res);
-        }
+            } else {
+                req.body = {};
+            }
+            try {
+                handler(req, res);
+            } catch (e) {
+                console.error('Handler error:', e);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: e.message || 'internal_server_error' }));
+            }
+        });
     } else {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'API Endpoint Not Found' }));
+        // GET/DELETE 等直接调用
+        try {
+            handler(req, res);
+        } catch (e) {
+            console.error('Handler error:', e);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: e.message || 'internal_server_error' }));
+        }
     }
 };
 

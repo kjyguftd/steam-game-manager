@@ -1,6 +1,8 @@
-const userModel = require('../models/userModel');
+// controllers/authController.js
+
+const userModel = require('../models/userModel.js');
 const crypto = require('crypto');
-const { createSession, deleteSession } = require('../data/sessions');
+const { createSession, deleteSession } = require('../data/sessions.js');
 
 // 密码加密配置
 const HASH_CONFIG = {
@@ -38,7 +40,6 @@ const register = async (req, res) => {
         // 3. 生成盐值和密码哈希
         const salt = crypto.randomBytes(HASH_CONFIG.saltlen);
 
-        // 使用 crypto.scrypt 进行异步哈希
         const hashedPasswordBuffer = await new Promise((resolve, reject) => {
             crypto.scrypt(password, salt, HASH_CONFIG.keylen, HASH_CONFIG, (err, derivedKey) => {
                 if (err) return reject(err);
@@ -50,10 +51,30 @@ const register = async (req, res) => {
         const saltHex = bufferToHex(salt);
 
         // 4. 创建用户并存储
-        await userModel.createUser(username, hashedPassword, saltHex, steamId64);
+        const newUser = await userModel.createUser(username, hashedPassword, saltHex, steamId64); // 确保 createUser 返回 newUser 对象
 
-        res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'User created successfully.' }));
+        // 5. 注册成功：创建会话并设置 HTTP-only Cookie
+        const sessionId = createSession(newUser.id); // 使用新用户ID创建会话
+
+        const cookieOptions = [
+            `sessionId=${sessionId}`,
+            'HttpOnly',
+            // 'Secure', // 保持原样
+            'Max-Age=3600',
+            'Path=/',
+            'SameSite=Lax'
+        ].join('; ');
+
+
+        res.writeHead(201, {
+            'Content-Type': 'application/json',
+            'Set-Cookie': cookieOptions // 设置 Cookie
+        });
+        // 📌 核心修改：返回 userId，供前端存储在全局变量中
+        res.end(JSON.stringify({
+            message: 'User created successfully.',
+            userId: newUser.id // 返回新用户的 ID
+        }));
 
     } catch (error) {
         console.error('Registration error:', error);
@@ -75,7 +96,6 @@ const login = async (req, res) => {
     const user = await userModel.findUserByUsername(username);
 
     if (!user) {
-        // 为了安全，不要透露是用户名不存在还是密码错误
         res.writeHead(401, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ message: 'Invalid credentials.' }));
     }
@@ -85,7 +105,6 @@ const login = async (req, res) => {
         const saltBuffer = hexToBuffer(user.salt);
         const storedHashedPasswordBuffer = hexToBuffer(user.hashedPassword);
 
-        // 再次使用 crypto.scrypt 哈希输入密码进行比对
         const inputHashedPasswordBuffer = await new Promise((resolve, reject) => {
             crypto.scrypt(password, saltBuffer, HASH_CONFIG.keylen, HASH_CONFIG, (err, derivedKey) => {
                 if (err) return reject(err);
@@ -104,12 +123,11 @@ const login = async (req, res) => {
         // 3. 登录成功：创建会话并设置 HTTP-only Cookie
         const sessionId = createSession(user.id);
 
-        // 设置 HTTP-only Cookie
         const cookieOptions = [
             `sessionId=${sessionId}`,
-            'HttpOnly', // 关键安全要求：禁止客户端JS访问
-            'Secure',   // 生产环境应该设置（仅HTTPS），本地可暂时忽略
-            'Max-Age=3600', // 1小时过期
+            'HttpOnly',
+            // 'Secure',
+            'Max-Age=3600',
             'Path=/',
             'SameSite=Lax'
         ].join('; ');
@@ -118,6 +136,7 @@ const login = async (req, res) => {
             'Content-Type': 'application/json',
             'Set-Cookie': cookieOptions
         });
+        // 登录响应中已包含 userId: user.id
         res.end(JSON.stringify({ message: 'Login successful.', userId: user.id }));
 
     } catch (error) {
@@ -127,15 +146,12 @@ const login = async (req, res) => {
     }
 };
 
-// ------------------- 登出 -------------------
+// ------------------- 登出 / 认证中间件 -------------------
+
+// 保持 logout 和 authenticate 函数不变
 
 const logout = (req, res) => {
     // 销毁服务器上的会话
-    // 由于 Cookie 是 HttpOnly，我们无法在服务器端直接获取会话ID，但可以通过解析请求头获取
-    // 实际项目中，通常需要一个通用的中间件来获取会话ID
-    // 假设我们通过 req.cookies.sessionId 获取
-
-    // ⚠️ 实际获取 Cookie 的代码需要放在一个中间件中，这里我们做简单处理
     const cookies = require('../data/sessions').parseCookies(req);
     const sessionId = cookies.sessionId;
 
@@ -151,13 +167,8 @@ const logout = (req, res) => {
     res.end(JSON.stringify({ message: 'Logged out successfully.' }));
 };
 
-// ------------------- 认证中间件 -------------------
-
 /**
  * 检查用户是否已登录。如果登录，将 userId 附加到 req.userId
- * @param {object} req
- * @param {object} res
- * @param {function} next
  */
 const authenticate = (req, res, next) => {
     const cookies = require('../data/sessions').parseCookies(req);

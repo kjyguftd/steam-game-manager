@@ -1,10 +1,13 @@
-const steamApi = require('../utils/steamApi');
-const { readJsonFile } = require('../utils/fileUtils');
-const backlogModel = require('../models/backlogModel');
-const { authenticate } = require('./authController');
+const steamApi = require('../utils/steamApi.js');
+const { readJsonFile } = require('../utils/fileUtils.js');
+const backlogModel = require('../models/backlogModel.js');
+const { authenticate } = require('./authController.js');
+// 📌 修正点 1: 导入解密和加密 Key 获取工具
+const { decrypt } = require('../utils/crypto.js');
+const { getEncryptedApiKey } = require('../utils/userStore.js');
 
 /**
- * Helper function: Get SteamID64 by userId
+ * Helper function: Get SteamID64 by userId (only ID)
  */
 const getSteamId64ByUserId = async (userId) => {
     const users = await readJsonFile('users.json');
@@ -27,13 +30,28 @@ const getPlaytimeSummary = async (req, res) => {
             return res.end(JSON.stringify({ message: 'User SteamID64 not found.' }));
         }
 
-        // 2. Call Steam API to get game data
-        const steamGames = await steamApi.getOwnedGames(steamId64);
+        // 📌 修正点 2: 显式获取并解密 API Key
+        let apiKey;
+        try {
+            const encryptedKeyObj = await getEncryptedApiKey(userId);
+            if (!encryptedKeyObj) {
+                // 如果找不到加密 Key，则抛出配置缺失错误
+                throw new steamApi.MissingConfigurationError('Steam API Key not found for user.');
+            }
+            apiKey = decrypt(encryptedKeyObj);
+        } catch (e) {
+            // 捕获解密失败或找不到 Key 的错误，并重新抛出配置缺失错误
+            if (e instanceof steamApi.MissingConfigurationError) throw e;
+            throw new steamApi.MissingConfigurationError('Invalid or corrupt Steam API Key configuration.');
+        }
+
+        // 2. Call Steam API to get game data (显式传递解密后的 key)
+        const steamGames = await steamApi.getOwnedGames(steamId64, apiKey);
 
         // 3. Sort games by playtime (descending) and filter out games with 0 playtime
         const gamesWithPlaytime = steamGames
-            .filter(game => game.playtime_forever > 0)
-            .sort((a, b) => b.playtime_forever - a.playtime_forever);
+            .filter(game => game.playtimeMinutes > 0) // steamApi already converts to minutes
+            .sort((a, b) => b.playtimeMinutes - a.playtimeMinutes);
 
         // 4. Get top 15 games and sum up the rest as "Others"
         const top15Games = gamesWithPlaytime.slice(0, 15);
@@ -65,13 +83,13 @@ const getPlaytimeSummary = async (req, res) => {
         // Add top 15 games
         top15Games.forEach((game, index) => {
             labels.push(game.name);
-            dataValues.push(Math.round(game.playtime_forever / 60)); // Convert to hours
+            dataValues.push(Math.round(game.playtimeMinutes / 60)); // Convert to hours
             backgroundColors.push(colorPalette[index % colorPalette.length]);
         });
 
         // Add "Others" if there are more games
         if (otherGames.length > 0) {
-            const othersPlaytime = otherGames.reduce((sum, game) => sum + game.playtime_forever, 0);
+            const othersPlaytime = otherGames.reduce((sum, game) => sum + game.playtimeMinutes, 0);
             labels.push('Others');
             dataValues.push(Math.round(othersPlaytime / 60)); // Convert to hours
             backgroundColors.push('rgba(201, 203, 207, 0.6)'); // Grey for Others
@@ -92,6 +110,17 @@ const getPlaytimeSummary = async (req, res) => {
 
     } catch (error) {
         console.error('Error fetching playtime summary:', error);
+
+        // 📌 修正点 3: 捕获 MissingConfigurationError
+        if (error instanceof steamApi.MissingConfigurationError) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({
+                message: error.message,
+                errorCode: error.errorCode,
+                requiresAction: true
+            }));
+        }
+
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Failed to generate chart data.' }));
     }
