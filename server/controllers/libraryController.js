@@ -3,7 +3,6 @@ const { readJsonFile } = require('../utils/fileUtils.js');
 const { authenticate } = require('./authController.js');
 const { getOwnedGames, MissingConfigurationError } = require('../utils/steamApi.js');
 const backlogModel = require('../models/backlogModel.js');
-// 📌 修正点 1: 导入解密和加密 Key 获取工具
 const { decrypt } = require('../utils/crypto.js');
 const { getEncryptedApiKey } = require('../utils/userStore.js');
 
@@ -17,7 +16,7 @@ const getSteamId64ByUserId = async (userId) => {
     const users = (await readJsonFile(USER_FILE)) || [];
     if (!Array.isArray(users)) return null;
     const user = users.find(u => u.id === userId);
-    // 📌 修正 2: 只返回 steamId64
+    // 只返回 steamId64
     return user ? user.steamId64 : null;
 };
 
@@ -35,7 +34,7 @@ const syncLibrary = async (req, res) => {
             return res.end(JSON.stringify({ message: 'User SteamID64 not found or user not registered correctly.' }));
         }
 
-        // 📌 修正点 3: 显式获取并解密 API Key
+        // 显式获取并解密 API Key
         let apiKey;
         try {
             const encryptedKeyObj = await getEncryptedApiKey(userId);
@@ -60,7 +59,7 @@ const syncLibrary = async (req, res) => {
         }, {});
 
         // 3. 调用 Steam API 代理获取原始游戏数据
-        // 📌 修正点 4: 显式传递解密后的 apiKey
+        // 显式传递解密后的 apiKey
         const steamGames = await getOwnedGames(steamId64, apiKey);
 
         // 4. 合并并格式化数据
@@ -90,7 +89,7 @@ const syncLibrary = async (req, res) => {
     } catch (error) {
         console.error('Library sync error:', error.stack || error);
 
-        // 📌 核心修改：捕获特定的 MissingConfigurationError
+        // 捕获特定的 MissingConfigurationError
         if (error instanceof MissingConfigurationError) {
             // 返回 403 Forbidden，通知前端这是配置问题
             res.writeHead(403, { 'Content-Type': 'application/json' });

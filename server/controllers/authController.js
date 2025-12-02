@@ -70,7 +70,7 @@ const register = async (req, res) => {
             'Content-Type': 'application/json',
             'Set-Cookie': cookieOptions // 设置 Cookie
         });
-        // 📌 核心修改：返回 userId，供前端存储在全局变量中
+        // 返回 userId，供前端存储在全局变量中
         res.end(JSON.stringify({
             message: 'User created successfully.',
             userId: newUser.id // 返回新用户的 ID

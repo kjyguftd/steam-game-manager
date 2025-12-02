@@ -62,7 +62,7 @@ const createUser = async (username, hashedPassword, salt, steamId64) => {
  * @returns {Promise<boolean>}
  */
 const saveSteamApiKey = async (userId, apiKey) => {
-    // 📌 修正点 2: 使用加密函数，并通过 userStore 存储加密后的对象
+    // 使用加密函数，并通过 userStore 存储加密后的对象
     try {
         const encryptedKey = encrypt(apiKey);
         // saveEncryptedApiKey 负责找到用户并将加密对象存储在 encryptedApiKey 字段中

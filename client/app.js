@@ -32,7 +32,7 @@ const checkLoginStatus = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     checkLoginStatus();
-    initLibrary(); // 📌 修正点 1 (App): 初始化库模块（绑定 API Key Modal 事件）
+    initLibrary(); // 初始化库模块（绑定 API Key Modal 事件）
 });
 
 // 认证事件

@@ -1,13 +1,12 @@
 // client/src/library.js
 
-import { API_BASE_URL, allGames } from './constants.js'; // 修正: setPlaytimeChartInstance 不在这里使用
-// 假设这些 DOM 元素在 donElements.js 中正确定义
+import { API_BASE_URL, allGames } from './constants.js';
 import {
     gameListUl, syncLibraryBtn, playerProfileEl, gameFilterSelect,
     apiKeyModal, apiKeyKeyInput, apiKeyCancelBtn, apiKeySaveBtn
 } from './donElements.js';
 import { renderPlaytimeChart } from './chart.js';
-import { displayAuthMessage } from './utils.js'; // 📌 修正点 2: 导入消息显示工具
+import { displayAuthMessage } from './utils.js'; // 导入消息显示工具
 
 /**
  * 客户端：更新游戏状态 (CRUD: PUT/POST)
@@ -233,7 +232,7 @@ const handleApiKeySave = async () => {
         apiKeyModal.setAttribute('aria-hidden', 'true');
         displayAuthMessage('Steam API Key saved successfully. Retrying sync...', false);
 
-        // 📌 核心：重试同步
+        // 重试同步
         await syncLibraryData();
 
     } catch (error) {
@@ -272,7 +271,7 @@ export const syncLibraryData = async () => {
                 result = await response.json();
                 message = (result && (result.message || result.error)) || message;
 
-                // 📌 核心修正点: 检查状态码 403 和自定义错误码 E_MISSING_STEAM_API_KEY
+                // 检查状态码 403 和自定义错误码 E_MISSING_STEAM_API_KEY
                 if (response.status === 403 && result && result.errorCode === 'E_MISSING_STEAM_API_KEY') {
                     isMissingKey = true;
                 }
@@ -331,7 +330,7 @@ export const initLibrary = () => {
         });
     }
 
-    // 📌 修正点 4: 绑定模态框事件
+    // 绑定模态框事件
     if (apiKeySaveBtn) {
         apiKeySaveBtn.addEventListener('click', handleApiKeySave);
     }

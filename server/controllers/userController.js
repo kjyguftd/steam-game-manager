@@ -9,7 +9,7 @@ module.exports.saveApiKey = async (req, res) => {
     const authUserId = req.userId; // 从 authenticate 中间件获取的已登录用户 ID
     const { apiKey } = req.body;
 
-    // 📌 修正点 1: 安全性检查：确保用户只能为自己保存 Key
+    // 安全性检查：确保用户只能为自己保存 Key
     if (authUserId && userId !== authUserId) {
         res.writeHead(403, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ message: 'Forbidden: Cannot save key for another user.' }));

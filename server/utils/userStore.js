@@ -56,7 +56,7 @@ function loadAllSync() {
 
 /**
  * 核心查找函数：根据用户 ID 查找单个用户
- * 📌 修正点 1: 实现一个可靠的 findUserById 函数
+ * 实现一个可靠的 findUserById 函数
  * @param {string} userId
  * @returns {Object|null}
  */
@@ -82,7 +82,7 @@ function findUserById(userId) {
 
 /**
  * 异步保存单个用户记录
- * 📌 修正点 2: 适应 users.json 的数组格式，查找并替换/更新用户
+ * 适应 users.json 的数组格式，查找并替换/更新用户
  * @param {string} userId
  * @param {Object} updates - 要合并到用户对象中的新字段
  */
@@ -113,7 +113,7 @@ async function saveUserUpdates(userId, updates) {
  * @param {Object} encryptedObj
  */
 async function saveEncryptedApiKey(userId, encryptedObj) {
-    // 📌 修正点 3: 调用新的 saveUserUpdates 函数
+    // 调用新的 saveUserUpdates 函数
     // 存储在 encryptedApiKey 字段中
     await saveUserUpdates(userId, { encryptedApiKey: encryptedObj });
 }
@@ -124,7 +124,7 @@ async function saveEncryptedApiKey(userId, encryptedObj) {
  * @returns {Object|null}
  */
 async function getEncryptedApiKey(userId) {
-    // 📌 修正点 4: 调用新的 findUserById 函数
+    // 调用新的 findUserById 函数
     const user = findUserById(userId);
     return user ? user.encryptedApiKey || null : null;
 }

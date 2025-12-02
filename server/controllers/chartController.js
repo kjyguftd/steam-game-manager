@@ -2,7 +2,6 @@ const steamApi = require('../utils/steamApi.js');
 const { readJsonFile } = require('../utils/fileUtils.js');
 const backlogModel = require('../models/backlogModel.js');
 const { authenticate } = require('./authController.js');
-// 📌 修正点 1: 导入解密和加密 Key 获取工具
 const { decrypt } = require('../utils/crypto.js');
 const { getEncryptedApiKey } = require('../utils/userStore.js');
 
@@ -30,7 +29,7 @@ const getPlaytimeSummary = async (req, res) => {
             return res.end(JSON.stringify({ message: 'User SteamID64 not found.' }));
         }
 
-        // 📌 修正点 2: 显式获取并解密 API Key
+        // 显式获取并解密 API Key
         let apiKey;
         try {
             const encryptedKeyObj = await getEncryptedApiKey(userId);
@@ -111,7 +110,7 @@ const getPlaytimeSummary = async (req, res) => {
     } catch (error) {
         console.error('Error fetching playtime summary:', error);
 
-        // 📌 修正点 3: 捕获 MissingConfigurationError
+        // 捕获 MissingConfigurationError
         if (error instanceof steamApi.MissingConfigurationError) {
             res.writeHead(403, { 'Content-Type': 'application/json' });
             return res.end(JSON.stringify({

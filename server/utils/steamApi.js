@@ -11,7 +11,7 @@ try {
     userStore = null;
 }
 
-// 📌 核心修改：定义一个自定义错误类用于配置缺失
+// 定义一个自定义错误类用于配置缺失
 /**
  * 自定义错误类型，用于指示缺少配置，前端可识别并提示用户输入。
  * @param {string} message
@@ -115,7 +115,7 @@ const getOwnedGames = (steamId64, maybeApiKeyOrOpts = null, timeoutMs = 10000) =
 
         const apiKey = resolveApiKey(maybeApiKeyOrOpts);
         if (!apiKey) {
-            // 📌 核心修改：当没有 API Key 时，抛出自定义错误，通知前端显示输入框
+            // 当没有 API Key 时，抛出自定义错误，通知前端显示输入框
             return reject(new MissingConfigurationError('Steam API Key is not configured.'));
         }
 

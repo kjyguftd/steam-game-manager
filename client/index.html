@@ -11,7 +11,6 @@
         /* API Key modal 样式 */
         #apikey-modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); z-index: 1000; }
         #apikey-modal .modal-content {
-            /* 📌 修正点 1: 使用 CSS 变量美化样式 */
             background: var(--color-card-bg);
             padding: 25px;
             border-radius: var(--border-radius);
@@ -112,10 +111,13 @@
         <h3 style="margin:0 0 8px 0; color:var(--color-primary);">Steam API Key Required</h3>
         <p style="margin-bottom: 20px; color: var(--color-text-muted); font-size: 0.9em;">
             To access your private Steam library data, please provide your personal Steam Web API Key.
+            <a href="https://steamcommunity.com/dev" target="_blank" style="color: inherit; text-decoration: underline;">
+                (Get your Steam Web API Key here)
+            </a>
         </p>
 
         <label for="apikey-key">Steam API Key</label>
-        <input id="apikey-key" type="text" placeholder="Paste your API key here (e.g., 5220F...044)">
+        <input id="apikey-key" type="password" placeholder="Paste your API key here (e.g., 5220F...044)">
 
         <div class="actions">
             <button id="apikey-cancel" type="button" class="btn btn-secondary">Cancel</button>

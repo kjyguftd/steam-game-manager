@@ -23,7 +23,6 @@ export const lifeBalanceEl = document.getElementById('life-balance');
 export const themeToggleBtn = document.getElementById('theme-toggle');
 export const gameFilterSelect = document.getElementById('game-filter');
 
-// 📌 修正点 1: 移除 apiKeyUserIdInput 的导出
 export const apiKeyModal = document.getElementById('apikey-modal');
 export const apiKeyKeyInput = document.getElementById('apikey-key');
 export const apiKeyCancelBtn = document.getElementById('apikey-cancel');

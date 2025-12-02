@@ -30,8 +30,6 @@ export const handleRegister = async (e) => {
         const result = await response.json();
 
         if (response.ok) {
-            // 📌 修正点 1 (Register): 虽然通常用户会跳转登录，但如果后端返回了 userId，这里也可以设置。
-            // 最佳实践：注册后应让用户走登录流程，这里不设置全局ID。
 
             displayAuthMessage('Registration successful! Please login.', false);
             // Switch back to login form
@@ -68,7 +66,7 @@ export const handleLogin = async (e) => {
         const result = await response.json();
 
         if (response.ok) {
-            // 📌 核心修正点 (Login): 将后端返回的 userId 存储到全局变量
+            // 将后端返回的 userId 存储到全局变量
             if (result.userId) {
                 window.currentUserId = result.userId; // 保留旧的变量以防依赖
                 window.CURRENT_USER_ID = result.userId; // 标准化变量
@@ -93,7 +91,7 @@ export const handleLogout = async () => {
     try {
         await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
 
-        // 📌 修正点 2 (Logout): 登出时清理全局 userId
+        // 登出时清理全局 userId
         window.currentUserId = null;
         window.CURRENT_USER_ID = null;
 

@@ -60,26 +60,6 @@ const matchRoute = (method, path) => {
     return null;
 };
 
-// // **新的路由匹配函数，支持动态路径**
-// const matchRoute = (method, path) => {
-//     const routeKeys = Object.keys(routes);
-//     for (const key of routeKeys) {
-//         const [routeMethod, routePathPattern] = key.split(' ');
-//
-//         if (routeMethod === method) {
-//             // 将路径模式转换为正则表达式 (替换 :id 为捕获组)
-//             const regexPath = routePathPattern.replace(/:[a-zA-Z]+/g, '([^/]+)');
-//             const regex = new RegExp(`^${regexPath}$`);
-//
-//             if (regex.test(path)) {
-//                 // 如果匹配，返回对应的处理函数
-//                 return routes[key];
-//             }
-//         }
-//     }
-//     return null; // 未找到匹配项
-// };
-
 const handleRequest = (req, res) => {
     // 基本 CORS 头
     res.setHeader('Access-Control-Allow-Origin', '*');
