@@ -39,11 +39,41 @@ This project meets all minimum requirements for the **Final Project Handout (Van
 
 ---
 
-## 🚀 Future Features (AI-Enhanced Capabilities)
-The architecture is prepared for the following stretch goals, which require integration with a local LLM like **Ollama**:
+## 🤖 AI Features (Ollama Integration)
 
-- **AI Player Profile**: Generate a unique "Player Style Profile" based on playtime and game data analysis.
-- **Life Balance Recommendations**: Provide specific, proactive advice to promote balanced screen time (e.g., suggesting breaks).
+This project integrates with **Ollama** to provide **local, privacy-friendly AI-powered insights**. The AI runs entirely on your machine—no data is sent to external servers.
+
+### What is Ollama?
+[Ollama](https://ollama.com) is an open-source tool that allows you to run large language models (LLMs) locally on your computer. Since the model runs on your machine, you don't need an internet connection for AI features, and your gaming data stays private.
+
+### Prerequisites for AI Features
+1. **Install Ollama**: Download and install from [ollama.com](https://ollama.com).
+2. **Pull a Model**: The project is configured to use `gemma3:270m` (a lightweight model). Run:
+   ```bash
+   ollama pull gemma3:270m
+   ```
+   > **Note**: You can use other models (e.g., `llama3`, `mistral`) by changing the `OLLAMA_MODEL` variable in `server/controllers/ollamaController.js`.
+3. **Ensure Ollama is Running**: 
+   - If installed via Homebrew on macOS, it may auto-start as a background service.
+   - Otherwise, run `ollama serve` in a terminal, or launch the Ollama desktop app.
+   - You can verify it's running by visiting `http://localhost:11434` in your browser.
+
+### AI Features
+- **AI Player Profile**: Analyzes your top 15 most-played games and generates a fun personality/gaming style profile.
+- **Life Balance Recommendations**: Based on your total playtime, provides friendly advice about gaming habits.
+
+### Important Notes
+- **AI features are optional**: The rest of the application works perfectly without Ollama.
+- **Local-only**: No API keys or cloud services required. All AI processing happens on your machine.
+- **Model size**: `gemma3:270m` is ~300MB. Larger models provide better responses but require more RAM/disk space.
+- **Response time**: First request may take a few seconds as the model loads into memory.
+
+### Troubleshooting
+| Issue | Solution |
+|-------|----------|
+| "Ollama connection failed" | Ensure Ollama is running (`ollama serve` or check the app). |
+| "Model not found" | Run `ollama pull gemma3:270m` to download the model. |
+| "Address already in use" (when running `ollama serve`) | Ollama is already running. This is fine—just proceed with `npm start`. |
 
 ---
 

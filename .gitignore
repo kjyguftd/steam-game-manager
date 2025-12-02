@@ -1,2 +1,13 @@
-# server/data/users.json
-# server/data/backlog.json
+# Sensitive data files
+server/data/users.json
+server/data/backlog.json
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+
+# Logs and temp files
+*.log
+cookies.txt
