@@ -81,11 +81,18 @@ const renderGameCard = (game) => {
     const statusDisplay = game.status || '';
 
     const imageUrls = [
-        `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
-        `https://steamcdn-a.akamaihd.net/steam/apps/${game.appId}/header.jpg`,
-        `https://cdn.akamai.steamstatic.com/steam/apps/${game.appId}/header.jpg`
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/hero.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/capsule_616x353.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/capsule_231x87.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/library_600x900.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/library_hero.jpg`,
+  `https://steamcdn-a.akamaihd.net/steam/apps/${game.appId}/header.jpg`,
+  `https://steamcdn-a.akamaihd.net/steam/apps/${game.appId}/hero.jpg`,
+  `https://cdn.akamai.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
+  `https://steamcommunity-a.akamaihd.net/economy/image/${game.appId}`
+];
 
-    ];
 
     const statuses = ['Planning', 'Playing', 'Completed'];
     const statusOptionsHtml = statuses.map(status => `
