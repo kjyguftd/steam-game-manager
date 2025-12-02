@@ -78,5 +78,13 @@
     "status": "Playing",
     "userRating": null,
     "targetFinishDate": null
+  },
+  {
+    "id": "722babc9-9b78-4d4d-a4ec-7a524f85a77b",
+    "userId": "4689d583-8273-4e10-8dfc-d935bd893691",
+    "appId": "3079280",
+    "status": "Planning",
+    "userRating": null,
+    "targetFinishDate": null
   }
 ]
