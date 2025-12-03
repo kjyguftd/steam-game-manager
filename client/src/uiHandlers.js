@@ -1,14 +1,17 @@
 import { syncLibraryData } from './library.js';
 import { renderPlaytimeChart } from './chart.js';
 import { mainApp } from './donElements.js';
+import { generateAIInsights } from './ollama.js';
 
 /**
  * 登录成功后加载仪表盘数据
  */
 export const loadDashboard = async () => {
-    // 1. Load chart and game list (syncLibraryData will call renderPlaytimeChart)
-    syncLibraryData();
-    // 2. Ignore Ollama-related calls
+    // 1. Load chart and game list
+    await syncLibraryData();
+    
+    // 2. Generate AI insights using Ollama
+    generateAIInsights();
 };
 
 /**

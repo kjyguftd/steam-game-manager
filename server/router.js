@@ -4,6 +4,7 @@ const libraryController = require('./controllers/libraryController.js');
 const backlogController = require('./controllers/backlogController.js');
 const chartController = require('./controllers/chartController.js');
 const userController = require('./controllers/userController.js');
+const ollamaController = require('./controllers/ollamaController.js');
 
 // 路由映射表使用路径模式 (注意：使用 :id 作为占位符)
 // { 'METHOD /path/pattern': handlerFunction }
@@ -28,6 +29,10 @@ const routes = {
 
     // 保存用户 Steam API Key（必须认证或可按需移除认证）
     'POST /api/user/:id/apikey': (req, res) => authController.authenticate(req, res, userController.saveApiKey),
+
+    // Ollama AI 路由 (需要认证)
+    'POST /api/ollama/profile': (req, res) => authController.authenticate(req, res, ollamaController.generatePlayerProfile),
+    'POST /api/ollama/balance': (req, res) => authController.authenticate(req, res, ollamaController.generateLifeBalance),
 };
 
 /**

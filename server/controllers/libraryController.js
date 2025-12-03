@@ -21,6 +21,61 @@ const getSteamId64ByUserId = async (userId) => {
 };
 
 /**
+ * 获取合并后的游戏库数据 (内部使用，供 ollamaController 调用)
+ * @param {string} userId 
+ * @returns {Promise<Array>} 合并后的游戏列表
+ */
+const getLibraryData = async (userId) => {
+    // 1. 获取用户的 SteamID64
+    const steamId64 = await getSteamId64ByUserId(userId);
+    if (!steamId64) {
+        throw new Error('User SteamID64 not found or user not registered correctly.');
+    }
+
+    // 获取并解密 API Key
+    let apiKey;
+    try {
+        const encryptedKeyObj = await getEncryptedApiKey(userId);
+        if (!encryptedKeyObj) {
+            throw new MissingConfigurationError('Steam API Key not found for user.');
+        }
+        apiKey = decrypt(encryptedKeyObj);
+    } catch (e) {
+        if (e instanceof MissingConfigurationError) throw e;
+        throw new MissingConfigurationError('Invalid or corrupt Steam API Key configuration.');
+    }
+
+    // 2. 获取用户本地的 Backlog 数据
+    const localBacklog = await backlogModel.getBacklogByUserId(userId);
+    const backlogMap = localBacklog.reduce((map, item) => {
+        map[item.appId] = item;
+        return map;
+    }, {});
+
+    // 3. 调用 Steam API 代理获取原始游戏数据
+    const steamGames = await getOwnedGames(steamId64, apiKey);
+
+    // 4. 合并并格式化数据
+    const mergedGames = steamGames.map(game => {
+        const appId = game.appId.toString();
+        const backlogEntry = backlogMap[appId];
+
+        return {
+            appId: appId,
+            name: game.name,
+            playtimeMinutes: game.playtimeMinutes,
+            isBacklogged: !!backlogEntry,
+            status: backlogEntry ? backlogEntry.status : null,
+            userRating: backlogEntry ? backlogEntry.userRating : null,
+            targetFinishDate: backlogEntry ? backlogEntry.targetFinishDate : null,
+            backlogId: backlogEntry ? backlogEntry.id : null,
+        };
+    });
+
+    return mergedGames;
+};
+
+/**
  * 游戏库同步处理函数
  */
 const syncLibrary = async (req, res) => {
@@ -111,4 +166,7 @@ const syncLibrary = async (req, res) => {
     }
 };
 
-module.exports.syncLibrary = syncLibrary;
+module.exports = {
+    syncLibrary,
+    getLibraryData
+};
