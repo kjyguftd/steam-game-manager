@@ -48,9 +48,9 @@ This project integrates with **Ollama** to provide **local, privacy-friendly AI-
 
 ### Prerequisites for AI Features
 1. **Install Ollama**: Download and install from [ollama.com](https://ollama.com).
-2. **Pull a Model**: The project is configured to use `gemma3:270m` (a lightweight model). Run:
+2. **Pull a Model**: The project is configured to use `gemma3:4b` (a lightweight model). Run:
    ```bash
-   ollama pull gemma3:270m
+   ollama pull gemma3:4b
    ```
    > **Note**: You can use other models (e.g., `llama3`, `mistral`) by changing the `OLLAMA_MODEL` variable in `server/controllers/ollamaController.js`.
 3. **Ensure Ollama is Running**: 
@@ -65,14 +65,14 @@ This project integrates with **Ollama** to provide **local, privacy-friendly AI-
 ### Important Notes
 - **AI features are optional**: The rest of the application works perfectly without Ollama.
 - **Local-only**: No API keys or cloud services required. All AI processing happens on your machine.
-- **Model size**: `gemma3:270m` is ~300MB. Larger models provide better responses but require more RAM/disk space.
+- **Model size**: `gemma3:4b` is ~3.1GB. Larger models provide better responses but require more RAM/disk space.
 - **Response time**: First request may take a few seconds as the model loads into memory.
 
 ### Troubleshooting
 | Issue | Solution |
 |-------|----------|
 | "Ollama connection failed" | Ensure Ollama is running (`ollama serve` or check the app). |
-| "Model not found" | Run `ollama pull gemma3:270m` to download the model. |
+| "Model not found" | Run `ollama pull gemma3:4b` to download the model. |
 | "Address already in use" (when running `ollama serve`) | Ollama is already running. This is fine—just proceed with `npm start`. |
 
 ---

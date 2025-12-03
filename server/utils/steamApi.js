@@ -157,9 +157,18 @@ const getOwnedGames = (steamId64, maybeApiKeyOrOpts = null, timeoutMs = 10000) =
                         name: g.name || g.title || '',
                         playtimeMinutes: Number.isFinite(g.playtime_forever) ? g.playtime_forever : (g.playtime_forever === 0 ? 0 : (g.playtime || 0)),
                         imgUrls: [
-                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appid}/header.jpg`,
-                            `https://steamcdn-a.akamaihd.net/steam/apps/${g.appid}/header.jpg`,
-                            `https://cdn.akamai.steamstatic.com/steam/apps/${g.appid}/header.jpg`
+                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appId}/header.jpg`,
+                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appId}/hero.jpg`,
+                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appId}/capsule_616x353.jpg`,
+                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appId}/capsule_231x87.jpg`,
+                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appId}/library_600x900.jpg`,
+                            `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.appId}/library_hero.jpg`,
+                            `https://steamcdn-a.akamaihd.net/steam/apps/${g.appId}/header.jpg`,
+                            `https://steamcdn-a.akamaihd.net/steam/apps/${g.appId}/hero.jpg`,
+
+                            `https://cdn.akamai.steamstatic.com/steam/apps/${g.appId}/header.jpg`,
+
+                            `https://steamcommunity-a.akamaihd.net/economy/image/${g.appId}`
                         ]
                     }));
 

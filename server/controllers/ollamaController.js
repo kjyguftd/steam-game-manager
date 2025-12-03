@@ -6,7 +6,7 @@ const { getLibraryData } = require('./libraryController.js');
 
 const OLLAMA_HOST = '127.0.0.1';
 const OLLAMA_PORT = 11434;
-const OLLAMA_MODEL = 'gemma3:270m'; // Change this to your preferred model
+const OLLAMA_MODEL = 'gemma3:4b'; // Change this to your preferred model
 
 /**
  * Helper function to send request to Ollama
@@ -103,8 +103,7 @@ const generatePlayerProfile = async (req, res) => {
         }
 
         const prompt = `
-Based on the following list of most played games and their playtimes, analyze the player's gaming style, favorite genres, and personality traits. 
-Keep the response concise (under 100 words) and fun.
+Given the player's most-played games and total hours, roast-analyze his/her gaming style, favorite genres, and personality traits. Make it sharp, witty, and under 150 words
 
 Games: ${topGames}
         `.trim();
